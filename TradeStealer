@@ -1,6 +1,37 @@
-local data = require(game.ReplicatedStorage.ClientModules.Core.ClientData).get_data()[game.Players.LocalPlayer.Name]
-print("=== YOUR PETS LIST ===")
-for i, v in pairs(data.inventory.pets) do
-    print(string.format("[%d] Name: %s | ID: %s | Kind: %s", i, v.name or "?", v.id or "?", v.kind or "?"))
+local RS = game:GetService("ReplicatedStorage")
+local player = game.Players.LocalPlayer
+
+-- Wait for character
+local char = player.Character or player.CharacterAdded:Wait()
+
+-- Folder containing pet models
+local petFolder = RS:WaitForChild("Pets")
+
+-- Function to replace the pet
+local function replacePet(newPetName)
+	local oldPet = workspace:FindFirstChild("MyPet")
+	if not oldPet then
+		warn("❌ No current pet named 'MyPet' in Workspace!")
+		return
+	end
+
+	local oldCFrame = oldPet:GetPrimaryPartCFrame()
+	oldPet:Destroy()
+
+	local newPet = petFolder:FindFirstChild(newPetName)
+	if not newPet then
+		warn("❌ Pet model '" .. newPetName .. "' not found in ReplicatedStorage.Pets!")
+		return
+	end
+
+	local clone = newPet:Clone()
+	clone.Name = "MyPet"
+	clone:SetPrimaryPartCFrame(oldCFrame)
+	clone.Parent = workspace
+
+	print("✅ Replaced with pet:", newPetName)
 end
-print("=== END ===")
+
+-- Auto-run example
+task.wait(3) -- Wait a bit after loading
+replacePet("BatDragon")
