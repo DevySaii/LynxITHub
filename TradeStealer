@@ -1,54 +1,16 @@
--- 🐉 Fake Bat Dragon Follow Script (for Swift Executor)
 local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
 local player = Players.LocalPlayer
-local char = player.Character or player.CharacterAdded:Wait()
 
--- 🆕 Updated Bat Dragon asset ID from Roblox Store
-local batDragonModelID = 14972007526
+local gui = Instance.new("BillboardGui")
+gui.Adornee = player.Character:WaitForChild("Head")
+gui.Size = UDim2.new(0, 200, 0, 50)
+gui.StudsOffset = Vector3.new(0, 2, 0)
+gui.AlwaysOnTop = true
 
--- 🔄 Load Model Function
-local function loadAsset(id)
-	local success, model = pcall(function()
-		return game:GetObjects("rbxassetid://" .. id)[1]
-	end)
-	if success and model then
-		model.Name = "FakeBatDragon"
-		model.Parent = workspace
-		return model
-	else
-		warn("❌ Failed to load model. Double check the asset ID or if it's private.")
-	end
-end
-
--- 🧲 Pet Follower Logic
-local function spawnPet()
-	local model = loadAsset(batDragonModelID)
-	if not model then return end
-
-	-- Ensure PrimaryPart is set
-	if not model.PrimaryPart then
-		model.PrimaryPart = model:FindFirstChildWhichIsA("BasePart") or model:FindFirstChild("HumanoidRootPart") or model:FindFirstChild("Head")
-	end
-
-	if not model.PrimaryPart then
-		warn("❌ No usable PrimaryPart found on model.")
-		return
-	end
-
-	-- Initial position beside player
-	model:SetPrimaryPartCFrame(char.HumanoidRootPart.CFrame * CFrame.new(-3, 0, 3))
-
-	-- Smooth follow every frame
-	RunService.RenderStepped:Connect(function()
-		if model and model.PrimaryPart and char:FindFirstChild("HumanoidRootPart") then
-			local targetPos = char.HumanoidRootPart.Position + Vector3.new(-3, 0, 3)
-			local currentPos = model.PrimaryPart.Position
-			local newPos = currentPos:Lerp(targetPos, 0.1)
-			model:SetPrimaryPartCFrame(CFrame.new(newPos, char.HumanoidRootPart.Position))
-		end
-	end)
-end
-
--- ✅ Spawn the Bat Dragon!
-spawnPet()
+local text = Instance.new("TextLabel", gui)
+text.Size = UDim2.new(1, 0, 1, 0)
+text.BackgroundTransparency = 1
+text.Text = "✅ Script Ran"
+text.TextColor3 = Color3.new(0, 1, 0)
+text.TextScaled = true
+gui.Parent = player:WaitForChild("PlayerGui")
