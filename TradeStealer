@@ -1,13 +1,19 @@
-local PetToChangeID = "bee_2021"
-local PetToGetID = "bat_dragon_legendary"
+-- 🔁 Replace pets locally: Cold Cube ➜ Bat Dragon
+local replaceFrom = "coldcube" -- original pet id in inventory
+local replaceTo = "batdragon" -- pretend it's this
 
-while task.wait(0.1) do
-	local playerData = require(game.ReplicatedStorage.ClientModules.Core.ClientData).get_data()[game.Players.LocalPlayer.Name]
-	local pets = playerData.inventory.pets
-	for i, v in pairs(pets) do
-		if v.kind == PetToChangeID then
-			v.kind = PetToGetID
-			v.id = PetToGetID
-		end
-	end
+local player = game.Players.LocalPlayer
+local petData = require(game.ReplicatedStorage.ClientModules.Core.ClientData).get_data()[player.Name]
+local pets = petData and petData.inventory and petData.inventory.pets
+
+if pets then
+    for _, pet in pairs(pets) do
+        if pet.kind == replaceFrom then
+            print("🔁 Replacing", pet.kind, "->", replaceTo)
+            pet.kind = replaceTo
+            pet.id = replaceTo
+        end
+    end
+else
+    warn("❌ Could not access pet inventory")
 end
