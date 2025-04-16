@@ -1,6 +1,6 @@
 -- 🔁 Replace pets locally: Cold Cube ➜ Bat Dragon
-local replaceFrom = "coldcube" -- original pet id in inventory
-local replaceTo = "batdragon" -- pretend it's this
+local replaceFrom = "Bee" -- original pet id in inventory
+local replaceTo = "BatDragon" -- pretend it's this
 
 local player = game.Players.LocalPlayer
 local petData = require(game.ReplicatedStorage.ClientModules.Core.ClientData).get_data()[player.Name]
