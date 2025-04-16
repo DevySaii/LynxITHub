@@ -1,16 +1,54 @@
 local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
 local player = Players.LocalPlayer
+local char = player.Character or player.CharacterAdded:Wait()
+local root = char:WaitForChild("HumanoidRootPart")
 
-local gui = Instance.new("BillboardGui")
-gui.Adornee = player.Character:WaitForChild("Head")
-gui.Size = UDim2.new(0, 200, 0, 50)
-gui.StudsOffset = Vector3.new(0, 2, 0)
-gui.AlwaysOnTop = true
+-- Create body
+local body = Instance.new("Part")
+body.Size = Vector3.new(2, 2, 2)
+body.Shape = Enum.PartType.Ball
+body.Material = Enum.Material.Neon
+body.BrickColor = BrickColor.new("Really black")
+body.Anchored = false
+body.CanCollide = false
+body.Name = "BatDragonBody"
+body.Position = root.Position + Vector3.new(-3, 0, 3)
+body.Parent = workspace
 
-local text = Instance.new("TextLabel", gui)
-text.Size = UDim2.new(1, 0, 1, 0)
-text.BackgroundTransparency = 1
-text.Text = "✅ Script Ran"
-text.TextColor3 = Color3.new(0, 1, 0)
-text.TextScaled = true
-gui.Parent = player:WaitForChild("PlayerGui")
+-- Create wings (left + right)
+local function createWing(side)
+	local wing = Instance.new("Part")
+	wing.Size = Vector3.new(2, 1, 4)
+	wing.Material = Enum.Material.ForceField
+	wing.BrickColor = BrickColor.new("Dark indigo")
+	wing.Anchored = false
+	wing.CanCollide = false
+	wing.Name = "Wing_" .. side
+	wing.Parent = workspace
+
+	-- Attach to body
+	local weld = Instance.new("WeldConstraint")
+	weld.Part0 = body
+	weld.Part1 = wing
+	weld.Parent = wing
+
+	if side == "Left" then
+		wing.CFrame = body.CFrame * CFrame.new(-2, 0, 0)
+	else
+		wing.CFrame = body.CFrame * CFrame.new(2, 0, 0)
+	end
+
+	return wing
+end
+
+local leftWing = createWing("Left")
+local rightWing = createWing("Right")
+
+-- Movement loop
+RunService.RenderStepped:Connect(function()
+	if not (body and root) then return end
+	local targetPos = root.Position + Vector3.new(-3, 2, 3)
+	local smoothPos = body.Position:Lerp(targetPos, 0.15)
+	body.CFrame = CFrame.new(smoothPos, root.Position)
+end)
