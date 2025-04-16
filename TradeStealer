@@ -1,39 +1,54 @@
--- Fake Bat Dragon Follow Script (LocalScript for Executor)
+-- 🐉 Fake Bat Dragon Follow Script (for Swift Executor)
 local Players = game:GetService("Players")
-local RS = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
 local player = Players.LocalPlayer
 local char = player.Character or player.CharacterAdded:Wait()
 
--- 🔥 Public Bat Dragon asset (you can change this to any model you want)
-local batDragonModelID = 13950389815 -- replace this with a real Bat Dragon model ID if you have one
+-- 🔥 Your public Bat Dragon model asset ID
+local batDragonModelID = 111205512336842
 
--- Load Model
+-- 🚀 Load the model from Roblox asset
 local function loadAsset(id)
-	local model = game:GetObjects("rbxassetid://" .. id)[1]
-	if model then
+	local success, model = pcall(function()
+		return game:GetObjects("rbxassetid://" .. id)[1]
+	end)
+	if success and model then
 		model.Name = "FakeBatDragon"
 		model.Parent = workspace
 		return model
+	else
+		warn("❌ Failed to load model. Check if asset ID is correct and public.")
 	end
 end
 
--- Spawn + Follow
+-- 🧲 Smooth follow script
 local function spawnPet()
 	local model = loadAsset(batDragonModelID)
 	if not model then return end
 
+	-- Make sure it has a PrimaryPart set
+	if not model.PrimaryPart then
+		model.PrimaryPart = model:FindFirstChildWhichIsA("BasePart") or model:FindFirstChild("HumanoidRootPart") or model:FindFirstChild("Head")
+	end
+
+	if not model.PrimaryPart then
+		warn("❌ No PrimaryPart found on model.")
+		return
+	end
+
+	-- Initial position
 	model:SetPrimaryPartCFrame(char.HumanoidRootPart.CFrame * CFrame.new(-3, 0, 3))
 
 	-- Follow logic
-	game:GetService("RunService").RenderStepped:Connect(function()
+	RunService.RenderStepped:Connect(function()
 		if model and model.PrimaryPart and char:FindFirstChild("HumanoidRootPart") then
 			local targetPos = char.HumanoidRootPart.Position + Vector3.new(-3, 0, 3)
-			local current = model.PrimaryPart.Position
-			local newPos = current:Lerp(targetPos, 0.1)
+			local currentPos = model.PrimaryPart.Position
+			local newPos = currentPos:Lerp(targetPos, 0.1)
 			model:SetPrimaryPartCFrame(CFrame.new(newPos, char.HumanoidRootPart.Position))
 		end
 	end)
 end
 
--- Spawn it!
+-- 🐉 Spawn it!
 spawnPet()
