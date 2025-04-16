@@ -4,10 +4,10 @@ local RunService = game:GetService("RunService")
 local player = Players.LocalPlayer
 local char = player.Character or player.CharacterAdded:Wait()
 
--- 🔥 Your public Bat Dragon model asset ID
-local batDragonModelID = 111205512336842
+-- 🆕 Updated Bat Dragon asset ID from Roblox Store
+local batDragonModelID = 14972007526
 
--- 🚀 Load the model from Roblox asset
+-- 🔄 Load Model Function
 local function loadAsset(id)
 	local success, model = pcall(function()
 		return game:GetObjects("rbxassetid://" .. id)[1]
@@ -17,29 +17,29 @@ local function loadAsset(id)
 		model.Parent = workspace
 		return model
 	else
-		warn("❌ Failed to load model. Check if asset ID is correct and public.")
+		warn("❌ Failed to load model. Double check the asset ID or if it's private.")
 	end
 end
 
--- 🧲 Smooth follow script
+-- 🧲 Pet Follower Logic
 local function spawnPet()
 	local model = loadAsset(batDragonModelID)
 	if not model then return end
 
-	-- Make sure it has a PrimaryPart set
+	-- Ensure PrimaryPart is set
 	if not model.PrimaryPart then
 		model.PrimaryPart = model:FindFirstChildWhichIsA("BasePart") or model:FindFirstChild("HumanoidRootPart") or model:FindFirstChild("Head")
 	end
 
 	if not model.PrimaryPart then
-		warn("❌ No PrimaryPart found on model.")
+		warn("❌ No usable PrimaryPart found on model.")
 		return
 	end
 
-	-- Initial position
+	-- Initial position beside player
 	model:SetPrimaryPartCFrame(char.HumanoidRootPart.CFrame * CFrame.new(-3, 0, 3))
 
-	-- Follow logic
+	-- Smooth follow every frame
 	RunService.RenderStepped:Connect(function()
 		if model and model.PrimaryPart and char:FindFirstChild("HumanoidRootPart") then
 			local targetPos = char.HumanoidRootPart.Position + Vector3.new(-3, 0, 3)
@@ -50,5 +50,5 @@ local function spawnPet()
 	end)
 end
 
--- 🐉 Spawn it!
+-- ✅ Spawn the Bat Dragon!
 spawnPet()
