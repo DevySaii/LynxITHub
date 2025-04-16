@@ -1,37 +1,39 @@
+-- Fake Bat Dragon Follow Script (LocalScript for Executor)
+local Players = game:GetService("Players")
 local RS = game:GetService("ReplicatedStorage")
-local player = game.Players.LocalPlayer
-
--- Wait for character
+local player = Players.LocalPlayer
 local char = player.Character or player.CharacterAdded:Wait()
 
--- Folder containing pet models
-local petFolder = RS:WaitForChild("Pets")
+-- 🔥 Public Bat Dragon asset (you can change this to any model you want)
+local batDragonModelID = 13950389815 -- replace this with a real Bat Dragon model ID if you have one
 
--- Function to replace the pet
-local function replacePet(newPetName)
-	local oldPet = workspace:FindFirstChild("MyPet")
-	if not oldPet then
-		warn("❌ No current pet named 'MyPet' in Workspace!")
-		return
+-- Load Model
+local function loadAsset(id)
+	local model = game:GetObjects("rbxassetid://" .. id)[1]
+	if model then
+		model.Name = "FakeBatDragon"
+		model.Parent = workspace
+		return model
 	end
-
-	local oldCFrame = oldPet:GetPrimaryPartCFrame()
-	oldPet:Destroy()
-
-	local newPet = petFolder:FindFirstChild(newPetName)
-	if not newPet then
-		warn("❌ Pet model '" .. newPetName .. "' not found in ReplicatedStorage.Pets!")
-		return
-	end
-
-	local clone = newPet:Clone()
-	clone.Name = "MyPet"
-	clone:SetPrimaryPartCFrame(oldCFrame)
-	clone.Parent = workspace
-
-	print("✅ Replaced with pet:", newPetName)
 end
 
--- Auto-run example
-task.wait(3) -- Wait a bit after loading
-replacePet("BatDragon")
+-- Spawn + Follow
+local function spawnPet()
+	local model = loadAsset(batDragonModelID)
+	if not model then return end
+
+	model:SetPrimaryPartCFrame(char.HumanoidRootPart.CFrame * CFrame.new(-3, 0, 3))
+
+	-- Follow logic
+	game:GetService("RunService").RenderStepped:Connect(function()
+		if model and model.PrimaryPart and char:FindFirstChild("HumanoidRootPart") then
+			local targetPos = char.HumanoidRootPart.Position + Vector3.new(-3, 0, 3)
+			local current = model.PrimaryPart.Position
+			local newPos = current:Lerp(targetPos, 0.1)
+			model:SetPrimaryPartCFrame(CFrame.new(newPos, char.HumanoidRootPart.Position))
+		end
+	end)
+end
+
+-- Spawn it!
+spawnPet()
